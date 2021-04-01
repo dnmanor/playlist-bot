@@ -4,14 +4,16 @@ const {
   isSupportedPlatform,
   getDestinationPlatform,
 } = require("./main/validators");
-const { fetchTaskID } = require("./main/fetch-playlist");
+const { fetchTaskID, checkTaskStatus } = require("./main/fetch-playlist");
+
+const { trimURL } = require("./main/sanitizers");
 
 require("dotenv").config();
 
 //Create new bot instance
 const bot = new TeleBot(process.env.BOT_API_KEY);
 
-//Liten for "start" or "hello"  and trigger res
+//Listen for "start" or "hello"  and trigger res
 bot.on(["/start", "/hello"], (msg) => {
   msg.reply.text(
     `Welcome ${msg.chat.first_name}! I am here to do one thing for you and one thing only. 
@@ -22,30 +24,80 @@ bot.on(["/start", "/hello"], (msg) => {
 
 //process playlist url(user input)
 bot.on("text", async (msg) => {
-  const validURL = await isValidURL(msg);
+  const messageObject = msg;
+  const urlInput = messageObject.text;
+
+  const url = await trimURL(urlInput);
+
+  const validURL = await isValidURL(url);
 
   if (!validURL) {
     msg.reply.text("Enter valid Apple Music or Spotify playlist url/link.");
   }
 
-  const supportedPlatform = isSupportedPlatform(msg);
+  const supportedPlatform = await isSupportedPlatform(url);
 
   if (!supportedPlatform) {
-    msg.reply.text("Platfprm not supported at the moment");
+    msg.reply.text("Platform not supported at the moment");
     throw new Error("platform not supported");
   } else {
     try {
       //get conversion destination
-      const destination = await getDestinationPlatform(msg);
-      //get task ID
-      const taskID = await fetchTaskID(msg, destination);
+      const destination = await getDestinationPlatform(url);
 
-      //check for task ID Errors
-      if (taskID === "") {
-        throw new Error();
+      //get task ID
+      const taskID = await fetchTaskID(url, destination);
+
+      let task = await checkTaskStatus(taskID);
+      let playlist = task.result;
+      let taskStatus = task.state;
+
+      async function checkForOtherStateUpdates() {
+        task = await checkTaskStatus(taskID);
+        playlist = task.result;
+        taskStatus = task.state;
+
+        console.log("Checking for different state ...");
+
+        if (taskStatus === "SUCCESS") {
+          msg.reply.text(
+            `${playlist} \nHere you go, your ${destination} playlist link. Enjoy your music and share!`
+          );
+        } else {
+          throw new Error();
+        }
       }
 
-      //do something with task ID
+      //check for celery status and move on from there with Errors or success
+      if (taskStatus === "SUCCESS") {
+        msg.reply.text(
+          `${playlist} \nHere you go, your ${destination} playlist link. Enjoy your music and share!`
+        );
+      } else if (taskStatus === "PENDING" || "PROGRESS") {
+        setTimeout(checkForOtherStateUpdates, 1500);
+      }
+
+
+      //   (function checkForOtherStates() {
+      //     if (taskStatus === "SUCCESS") {
+      //       msg.reply.text(
+      //         `${playlist} \nHere you go, your ${destination} playlist link. Enjoy your music and share!`
+      //       );
+      //     } else {
+      //       console.log("tried again");
+      //       console.log(x)
+      //       setTimeout(checkForOtherStates, 500);
+      //     }
+      //   }
+      // )();
+
+      // do {
+      //   task = await checkTaskStatus(taskID)
+      //   taskStatus = task.state
+      //   playlist = task.result
+
+      // } while (taskStatus === 'PENDING' || 'PROGRESS');
+
     } catch (error) {
       msg.reply.text("Oops, something went wrong. Please Try again.");
     }
