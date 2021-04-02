@@ -1,4 +1,4 @@
-# Playlist Converter (Telegram Bot) :robot_face:
+# Playlist Converter (Telegram Bot) :robot:
 
 A simple telegram bot to convert :repeat: your playlists from Apple Music to Spotify and vice versa :notes:
 
@@ -9,8 +9,8 @@ Main inspiration is [playlistor.io](https://playlistor.io/), in fact the bot dep
 ## TODO
 
 - [ ] Add suport for URL expansion
-- [ x ] Fix playlist link hard code
-- [ x ] Imporve user input sanitization
+- [x] Fix playlist link hard code
+- [x] Imporve user input sanitization
 - [ ] Log all request and conversions
 
 ## Special thanks
