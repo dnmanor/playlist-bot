@@ -16,19 +16,21 @@ const bot = new TeleBot(process.env.BOT_API_KEY);
 //Listen for "start" or "hello"  and trigger res
 bot.on(["/start", "/hello"], (msg) => {
   msg.reply.text(
-    `Welcome ${msg.chat.first_name}! I am here to do one thing for you and one thing only. 
-    That is, convert between your Apple and Spotify playlists. 
-    So go ahead and share the links with me, share and enjoy your music. `
-  );
+    `🎊🎊🎊🎊🎊🎊 \nWelcome ${msg.chat.first_name}! I am here to do one thing for you and one thing only.\nThat is, convert between your Apple and Spotify playlists.\nSo go ahead and share the links with me, share and enjoy your music.`
+    );
 });
 
 //process playlist url(user input)
 bot.on("text", async (msg) => {
+
+  if (msg.text.startsWith('/')) return
+
   const messageObject = msg;
   const urlInput = messageObject.text;
 
   const url = await trimURL(urlInput);
 
+  
   const validURL = await isValidURL(url);
 
   if (!validURL) {
@@ -76,27 +78,6 @@ bot.on("text", async (msg) => {
       } else if (taskStatus === "PENDING" || "PROGRESS") {
         setTimeout(checkForOtherStateUpdates, 1500);
       }
-
-
-      //   (function checkForOtherStates() {
-      //     if (taskStatus === "SUCCESS") {
-      //       msg.reply.text(
-      //         `${playlist} \nHere you go, your ${destination} playlist link. Enjoy your music and share!`
-      //       );
-      //     } else {
-      //       console.log("tried again");
-      //       console.log(x)
-      //       setTimeout(checkForOtherStates, 500);
-      //     }
-      //   }
-      // )();
-
-      // do {
-      //   task = await checkTaskStatus(taskID)
-      //   taskStatus = task.state
-      //   playlist = task.result
-
-      // } while (taskStatus === 'PENDING' || 'PROGRESS');
 
     } catch (error) {
       msg.reply.text("Oops, something went wrong. Please Try again.");
