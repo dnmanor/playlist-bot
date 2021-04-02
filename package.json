@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "",
+    "start": "node src/index.js",
+    "dev":"nodemon src/index.js **js"
+  },
+  "jest": {
+    "verbose": true
   },
   "keywords": [],
   "author": "",
