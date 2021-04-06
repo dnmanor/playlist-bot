@@ -2,7 +2,7 @@ const {
   isValidURL,
   isSupportedPlatform,
   getDestinationPlatform,
-} = require("../main/validators");
+} = require("../src/main/validators");
 
 //mock ups
 const mockAppleURL =
