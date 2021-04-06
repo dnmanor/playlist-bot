@@ -8,7 +8,7 @@ Main inspiration is [playlistor.io](https://playlistor.io/), in fact the bot dep
 
 ## TODO
 
-- [ ] Add suport for URL expansion
+- [x] Add suport for URL expansion
 - [x] Fix playlist link hard code
 - [x] Imporve user input sanitization
 - [ ] Log all request and conversions

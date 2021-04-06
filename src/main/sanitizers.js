@@ -12,9 +12,9 @@ module.exports = {
           },
           function(err, httpResponse) {
             if (err) {
-              return console.error(err)
+              throw new Error(err)
             }
-            console.log(httpResponse.headers.location || uri)
+            return httpResponse.headers.location || uri
           }
         )
         },
